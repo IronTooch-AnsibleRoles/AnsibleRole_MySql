@@ -1,0 +1,16 @@
+galaxy_info:
+  role_name: maria_db
+  namespace: irontooch
+  author: IronTooch
+  description: A role that installs MariaDb, adds a single database with a single database user
+  license: GPL-3.0-only
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+
+  galaxy_tags: []
+
+dependencies: []

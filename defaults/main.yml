@@ -1,0 +1,17 @@
+---
+# Items for Default Installation
+
+mariadb_app_name: "exampleapp"
+mariadb_dbname: "{{ mariadb_app_name }}_db"
+mariadb_dbuser: "{{ mariadb_app_name }}_dbuser"
+
+mariadb_socket: "/var/run/mysqld/mysqld.sock"
+
+mariadb_root_password: ""
+mariadb_dbuser_password: ""
+mariadb_root_pw_file: "/etc/mysql/root_pw"
+mariadb_dbuser_password_file: "/etc/mysql/user_{{ mariadb_dbuser }}"
+
+
+mariadb_initial_config_flag: "/etc/mysql/initial_config"
+mariadb_db_config_flag: "/etc/mysql/db_{{ mariadb_app_name }}_config"

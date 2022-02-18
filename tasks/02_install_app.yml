@@ -1,0 +1,64 @@
+---
+- name: Check for Initial Config Flag
+  ansible.builtin.stat:
+    path: "{{ mariadb_initial_config_flag }}"
+  register: mariadb_initial_config_complete
+  # to check file existance
+
+- name: MariaDb not installed, deploy and configure
+  block:
+
+    - name: Make new root password
+      ansible.builtin.set_fact:
+        mariadb_root_pw: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
+      when: not mariadb_root_password
+
+    - name: Install MariaDb
+      ansible.builtin.package:
+        name:
+          - mariadb-server
+        state: present
+      register: apt_status
+      until: apt_status is success
+      delay: 6
+      retries: 10
+
+    - name: Set root password
+      community.mysql.mysql_user:
+        name: 'root'
+        password: "{{ mariadb_root_password }}"
+        login_unix_socket: "{{ mariadb_socket }}"
+        state: present
+
+    - name: Set ~/.my.conf file
+      ansible.builtin.template:
+        src: .my.conf.j2
+        dest: "~/.my.cnf"
+        force: true
+        mode: '0700'  # Ansible-Lint hates when this isn't set
+
+    - name: Removes all anonymous user accounts
+      community.mysql.mysql_user:
+        name: ''
+        host_all: true
+        login_unix_socket: "{{ mariadb_socket }}"
+        state: absent
+
+    - name: Copy root PW
+      ansible.builtin.copy:
+        content: "{{ mariadb_root_password }}"
+        dest: "{{ mariadb_root_pw_file }}"
+        force: true
+        owner: "root"
+        group: "root"
+        mode: "0700"
+      when: mariadb_root_pw_file
+
+
+    - name: Make a flag to indicate that the mysql_secure_installation is complete
+      ansible.builtin.file:
+        path: "{{ mariadb_initial_config_flag }}"
+        state: touch
+        mode: "0700"
+
+  when: not mariadb_initial_config_complete.stat.exists
