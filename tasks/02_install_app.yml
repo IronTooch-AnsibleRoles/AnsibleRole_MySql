@@ -10,8 +10,15 @@
 
     - name: Make new root password
       ansible.builtin.set_fact:
-        mariadb_root_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
+        mariadb_root_pwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
       when: not mariadb_root_password
+      no_log: true
+
+    - name: Make set root password
+      ansible.builtin.set_fact:
+        mariadb_root_pwd: "{{ mariadb_root_password }}"
+      when: mariadb_root_password
+      no_log: true
 
     - name: Install MariaDb
       ansible.builtin.package:
@@ -29,6 +36,7 @@
         password: "{{ mariadb_root_password }}"
         login_unix_socket: "{{ mariadb_socket }}"
         state: present
+      no_log: true
 
     - name: Set ~/.my.conf file
       ansible.builtin.template:
@@ -36,6 +44,7 @@
         dest: "~/.my.cnf"
         force: true
         mode: '0700'  # Ansible-Lint hates when this isn't set
+      no_log: true
 
     - name: Removes all anonymous user accounts
       community.mysql.mysql_user:
@@ -53,6 +62,7 @@
         group: "root"
         mode: "0700"
       when: mariadb_root_pw_file
+      no_log: true
 
 
     - name: Make a flag to indicate that the mysql_secure_installation is complete

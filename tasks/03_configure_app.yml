@@ -6,6 +6,7 @@
 
 - name: Create Database and User
   block:
+
     - name: "Create a new database with name {{ mariadb_dbname }}"
       community.mysql.mysql_db:
         name: "{{ mariadb_dbname }}"
@@ -14,26 +15,36 @@
 
     - name: Make new '{{ mariadb_dbuser }}' password
       ansible.builtin.set_fact:
-        mariadb_dbuser_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
+        mariadb_dbuser_pwd: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
       when: not mariadb_dbuser_password
+      no_log: true
+
+    - name: Make new '{{ mariadb_dbuser }}' password
+      ansible.builtin.set_fact:
+        mariadb_dbuser_pwd: "{{ mariadb_dbuser_password }}"
+      when: mariadb_dbuser_password
+      no_log: true
+
 
     - name: "Create database user with name '{{ mariadb_dbuser }}' with all database privileges"
       community.mysql.mysql_user:
         name: "{{ mariadb_dbuser }}"
-        password: "{{ mariadb_dbuser_password }}"
+        password: "{{ mariadb_dbuser_pwd }}"
         login_unix_socket: "{{ mariadb_socket }}"
         priv: '*.*:ALL'
         state: present
+      no_log: true
 
     - name: Copy user PW
       ansible.builtin.copy:
-        content: "{{ mariadb_dbuser_password }}"
+        content: "{{ mariadb_dbuser_pwd }}"
         dest: "{{ mariadb_dbuser_password_file }}"
         force: true
         owner: "root"
         group: "root"
         mode: "0700"
       when: mariadb_dbuser_password_file
+      no_log: true
 
     - name: Create db_created flag
       ansible.builtin.file:
