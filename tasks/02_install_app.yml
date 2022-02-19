@@ -10,7 +10,7 @@
 
     - name: Make new root password
       ansible.builtin.set_fact:
-        mariadb_root_pw: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
+        mariadb_root_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits,punctuation length=20') }}"
       when: not mariadb_root_password
 
     - name: Install MariaDb

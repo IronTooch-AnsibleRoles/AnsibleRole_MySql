@@ -25,7 +25,7 @@
         priv: '*.*:ALL'
         state: present
 
-    - name: Copy root PW
+    - name: Copy user PW
       ansible.builtin.copy:
         content: "{{ mariadb_dbuser_password }}"
         dest: "{{ mariadb_dbuser_password_file }}"
