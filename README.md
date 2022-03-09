@@ -22,7 +22,7 @@ Role Variables
 - **mariadb_dbuser_password_file**: Where the database user password should be stored. If blank, don't save the password locally.
   - Defaults to */etc/mysql/user_{{ mariadb_dbuser }}*
 
-Note: **mariadb_dbname** and **mariadb_dbuser** are available for use in subsequent roles and plays
+Note: **mariadb_dbname**, **mariadb_dbuser**, and **mariadb_dbuser_pwd** are available for use in subsequent roles and plays
 
 Dependencies
 ------------
