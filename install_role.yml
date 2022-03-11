@@ -1,5 +1,10 @@
 ---
 - hosts: all
   become: true
-  roles:
-    - irontooch.maria_db
+  tasks:
+
+    - name: Install Role
+      ansible.builtin.include_role:
+        name: irontooch.maria_db
+        allow_duplicates: true
+        public: false
